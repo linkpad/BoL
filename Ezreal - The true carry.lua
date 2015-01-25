@@ -1,4 +1,4 @@
-local version = "0.1"
+local version = "0.2"
  
 if myHero.charName ~= "Ezreal" then return end
  
@@ -215,7 +215,6 @@ function Menu()
 		Settings.harass:addParam("useW", "Harass With (W)", SCRIPT_PARAM_ONOFF, true)
 		
 	Settings.combo:permaShow("comboKey")
-	Settings.combo:permaShow("useR")
 	Settings.combo:permaShow("RifKilable")
 	Settings.killsteal:permaShow("useQ")
 	Settings.killsteal:permaShow("useW")
