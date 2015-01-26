@@ -1,4 +1,4 @@
-local version = "0.2"
+local version = "0.3"
  
 if myHero.charName ~= "Ezreal" then return end
  
@@ -6,7 +6,7 @@ if myHero.charName ~= "Ezreal" then return end
  
 local REQUIRED_LIBS = {
         ["SxOrbwalk"] = "https://raw.githubusercontent.com/Superx321/BoL/master/common/SxOrbWalk.lua",
-        ["VPrediction"] = "https://raw.githubusercontent.com/Hellsing/BoL/master/common/VPrediction.lua",
+        ["VPrediction"] = "https://raw.githubusercontent.com/Ralphlol/BoLGit/master/VPrediction.lua",
 }
  
 local DOWNLOADING_LIBS, DOWNLOAD_COUNT = false, 0
