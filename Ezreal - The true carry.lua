@@ -1,4 +1,4 @@
-local version = "0.3"
+local version = "0.4"
  
 if myHero.charName ~= "Ezreal" then return end
  
@@ -132,7 +132,7 @@ function Checks()
 	SkillR.ready = (myHero:CanUseSpell(_R) == READY)
 	
 	TargetSelector:update()
-	if SelectedTarget ~= nil and ValidTarget(SelectedTarget) and GetDistance(SelectedTarget) <= SkillQ.range + 500 then
+	if SelectedTarget ~= nil and ValidTarget(SelectedTarget) then
 		Target = SelectedTarget
 	else
 		Target = GetCustomTarget()
