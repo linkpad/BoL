@@ -1,6 +1,6 @@
-local Ez_version = 0.5
- 
 if myHero.charName ~= "Ezreal" then return end
+
+local Ez_version = 0.6
 
 
 class "SxUpdate"
@@ -57,7 +57,7 @@ end
 local ForceReload = false
 SxUpdate(Ez_version,
 	"raw.githubusercontent.com",
-	"/linkpad/BoL/master/Ezreal%20-%20The%20true%20carry.version",
+	"/linkpad/BoL/master/Ezreal-The-true-carry.version",
 	"/linkpad/BoL/master/Ezreal%20-%20The%20true%20carry.lua",
 	SCRIPT_PATH.."/" .. GetCurrentEnv().FILE_NAME,
 	function(NewVersion) if NewVersion > Ez_version then print("<font color=\"#F0Ff8d\"><b>Ezreal - The true carry : </b></font> <font color=\"#FF0F0F\">Updated to "..NewVersion..". Please Reload with 2x F9</b></font>") ForceReload = true else print("<font color=\"#F0Ff8d\"><b>Ezreal - The true carry : </b></font> <font color=\"#FF0F0F\">You have the Latest Version</b></font>") end 
