@@ -1,72 +1,123 @@
-local version = "0.4"
+local Ez_version = 0.5
  
 if myHero.charName ~= "Ezreal" then return end
- 
- _G.UseUpdater = true
- 
-local REQUIRED_LIBS = {
-        ["SxOrbwalk"] = "https://raw.githubusercontent.com/Superx321/BoL/master/common/SxOrbWalk.lua",
-        ["VPrediction"] = "https://raw.githubusercontent.com/Ralphlol/BoLGit/master/VPrediction.lua",
-}
- 
-local DOWNLOADING_LIBS, DOWNLOAD_COUNT = false, 0
- 
-function AfterDownload()
-        DOWNLOAD_COUNT = DOWNLOAD_COUNT - 1
-        if DOWNLOAD_COUNT == 0 then
-                DOWNLOADING_LIBS = false
-                print("<b><font color=\"#FF001E\">Ezreal - The true carry</font></b> <font color=\"#FF980F\">Required libraries downloaded successfully, please reload (double F9).</font>")
-        end
+
+
+class "SxUpdate"
+function SxUpdate:__init(LocalVersion, Host, VersionPath, ScriptPath, SavePath, Callback)
+    self.Callback = Callback
+    self.LocalVersion = LocalVersion
+    self.Host = Host
+    self.VersionPath = VersionPath
+    self.ScriptPath = ScriptPath
+    self.SavePath = SavePath
+    self.LuaSocket = require("socket")
+    AddTickCallback(function() self:GetOnlineVersion() end)
 end
- 
-for DOWNLOAD_LIB_NAME, DOWNLOAD_LIB_URL in pairs(REQUIRED_LIBS) do
-        if FileExist(LIB_PATH .. DOWNLOAD_LIB_NAME .. ".lua") then
-                require(DOWNLOAD_LIB_NAME)
+
+function SxUpdate:GetOnlineVersion()
+    if not self.OnlineVersion and not self.VersionSocket then
+        self.VersionSocket = self.LuaSocket.connect("sx-bol.eu", 80)
+        self.VersionSocket:send("GET /BoL/TCPUpdater/GetScript.php?script="..self.Host..self.VersionPath.."&rand="..tostring(math.random(1000)).." HTTP/1.0\r\n\r\n")
+    end
+
+    if not self.OnlineVersion and self.VersionSocket then
+        self.VersionSocket:settimeout(0, 'b')
+        self.VersionSocket:settimeout(99999999, 't')
+        self.VersionReceive, self.VersionStatus = self.VersionSocket:receive('*a')
+    end
+
+    if not self.OnlineVersion and self.VersionSocket and self.VersionStatus ~= 'timeout' then
+        if self.VersionReceive then
+            self.OnlineVersion = tonumber(string.sub(self.VersionReceive, string.find(self.VersionReceive, "<bols".."cript>")+11, string.find(self.VersionReceive, "</bols".."cript>")-1))
         else
-                DOWNLOADING_LIBS = true
-                DOWNLOAD_COUNT = DOWNLOAD_COUNT + 1
-                DownloadFile(DOWNLOAD_LIB_URL, LIB_PATH .. DOWNLOAD_LIB_NAME..".lua", AfterDownload)
+            print('AutoUpdate Failed')
+			self.OnlineVersion = 0
         end
+        self:DownloadUpdate()
+    end
 end
- 
-if DOWNLOADING_LIBS then return end
- 
-local UPDATE_NAME = "Ezreal - The true carry"
-local UPDATE_HOST = "raw.github.com"
-local UPDATE_PATH = "/linkpad/BoL/master/Ezreal%20-%20The%20true%20carry.lua" .. "?rand=" .. math.random(1, 10000)
-local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
-local UPDATE_URL = "http://"..UPDATE_HOST..UPDATE_PATH
- 
- 
-function AutoupdaterMsg(msg) print("<b><font color=\"#FF001E\">"..UPDATE_NAME..":</font></b> <font color=\"#FF980F\">"..msg..".</font>") end
-if _G.UseUpdater then
-        local ServerData = GetWebResult(UPDATE_HOST, UPDATE_PATH)
-        if ServerData then
-                local ServerVersion = string.match(ServerData, "local version = \"%d+.%d+\"")
-                ServerVersion = string.match(ServerVersion and ServerVersion or "", "%d+.%d+")
-                if ServerVersion then
-                        ServerVersion = tonumber(ServerVersion)
-                        if tonumber(version) < ServerVersion then
-                                AutoupdaterMsg("New version available "..ServerVersion)
-                                AutoupdaterMsg("Updating, please don't press F9")
-                                DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () AutoupdaterMsg("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end)  
-                        else
-                                AutoupdaterMsg("You have got the latest version ("..ServerVersion..")")
-                        end
-                end
-        else
-                AutoupdaterMsg("Error downloading version info")
-        end
+
+function SxUpdate:DownloadUpdate()
+    if self.OnlineVersion > self.LocalVersion then
+        self.ScriptSocket = self.LuaSocket.connect("sx-bol.eu", 80)
+        self.ScriptSocket:send("GET /BoL/TCPUpdater/GetScript.php?script="..self.Host..self.ScriptPath.."&rand="..tostring(math.random(1000)).." HTTP/1.0\r\n\r\n")
+        self.ScriptReceive, self.ScriptStatus = self.ScriptSocket:receive('*a')
+        self.ScriptRAW = string.sub(self.ScriptReceive, string.find(self.ScriptReceive, "<bols".."cript>")+11, string.find(self.ScriptReceive, "</bols".."cript>")-1)
+        local ScriptFileOpen = io.open(self.SavePath, "w+")
+        ScriptFileOpen:write(self.ScriptRAW)
+        ScriptFileOpen:close()
+    end
+
+    if type(self.Callback) == 'function' then
+        self.Callback(self.OnlineVersion)
+    end
 end
+
+local ForceReload = false
+SxUpdate(Ez_version,
+	"raw.githubusercontent.com",
+	"/linkpad/BoL/master/Ezreal%20-%20The%20true%20carry.version",
+	"/linkpad/BoL/master/Ezreal%20-%20The%20true%20carry.lua",
+	SCRIPT_PATH.."/" .. GetCurrentEnv().FILE_NAME,
+	function(NewVersion) if NewVersion > Ez_version then print("<font color=\"#F0Ff8d\"><b>Ezreal - The true carry : </b></font> <font color=\"#FF0F0F\">Updated to "..NewVersion..". Please Reload with 2x F9</b></font>") ForceReload = true else print("<font color=\"#F0Ff8d\"><b>Ezreal - The true carry : </b></font> <font color=\"#FF0F0F\">You have the Latest Version</b></font>") end 
+end)
+	
+if FileExist(LIB_PATH .. "/SxOrbWalk.lua") then
+	require("SxOrbWalk")
+else
+	SxUpdate(0,
+		"raw.githubusercontent.com",
+		"/Superx321/BoL/master/common/SxOrbWalk.Version",
+		"/Superx321/BoL/master/common/SxOrbWalk.lua",
+		LIB_PATH.."/SxOrbWalk.lua",
+		function(NewVersion) if NewVersion > 0 then print("<font color=\"#F0Ff8d\"><b>SxOrbWalk: </b></font> <font color=\"#FF0F0F\">Updated to "..NewVersion..". Please Reload with 2x F9</b></font>") ForceReload = true end 
+	end)
+end
+	
+if FileExist(LIB_PATH .. "/VPrediction.lua") then
+	require("VPrediction")
+	VP = VPrediction()
+	if VP.version >= 3 then	
+		SxUpdate(0,
+			"raw.githubusercontent.com",
+			"/Ralphlol/BoLGit/master/VPrediction.version",
+			"/Ralphlol/BoLGit/master/VPrediction.lua",
+			LIB_PATH.."/VPrediction.lua",
+			function(NewVersion) if NewVersion > 0 then print("<font color=\"#F0Ff8d\"><b>VPrediction: </b></font> <font color=\"#FF0F0F\">Updated to "..NewVersion..". Please Reload with 2x F9</b></font>") ForceReload = true end 
+		end)
+	end
+else
+	SxUpdate(0,
+		"raw.githubusercontent.com",
+		"/Ralphlol/BoLGit/master/VPrediction.version",
+		"/Ralphlol/BoLGit/master/VPrediction.lua",
+		LIB_PATH.."/VPrediction.lua",
+		function(NewVersion) if NewVersion > 0 then print("<font color=\"#F0Ff8d\"><b>VPrediction: </b></font> <font color=\"#FF0F0F\">Updated to "..NewVersion..". Please Reload with 2x F9</b></font>") ForceReload = true end 
+	end)
+end
+
+
+
 
 function OnLoad()
         print("<b><font color=\"#FF001E\">Ezreal - The true carry : </font></b><font color=\"#FF980F\"> Free elo for you ! </font><font color=\"#FF001E\">| Linkpad |</font>")
+        if ForceReload then return end
         Skills()
+        TargetSelector = TargetSelector(TARGET_LESS_CAST_PRIORITY, SkillQ.range + 500, DAMAGE_PHYSICAL, false, true)
+        VP = VPrediction()
         Menu()
 end
 
 function OnTick()
+	if ForceReload then return end
+	KillSteall()
+	Checks()
 	ComboKey = Settings.combo.comboKey
+
+	TargetSelector:update()
+	Target = GetCustomTarget()
+	SxOrb:ForceTarget(Target)
 	
 	if ComboKey then
 		Combo(Target)
@@ -76,8 +127,6 @@ function OnTick()
 		Harass(Target)
 	end
 	
-	KillSteall()
-	Checks()
 end
 
 function Harass(unit)
@@ -131,15 +180,6 @@ function Checks()
 	SkillW.ready = (myHero:CanUseSpell(_W) == READY)
 	SkillR.ready = (myHero:CanUseSpell(_R) == READY)
 	
-	TargetSelector:update()
-	if SelectedTarget ~= nil and ValidTarget(SelectedTarget) then
-		Target = SelectedTarget
-	else
-		Target = GetCustomTarget()
-	end
-
-	SxOrb:ForceTarget(Target)
-	
 	if Settings.drawing.lfc.lfc then 
 		_G.DrawCircle = DrawCircle2 
 	else 
@@ -148,10 +188,15 @@ function Checks()
 end
 
 function GetCustomTarget()
- 	TargetSelector:update() 	
-	if _G.MMA_Target and _G.MMA_Target.type == myHero.type then return _G.MMA_Target end
-	if _G.AutoCarry and _G.AutoCarry.Crosshair and _G.AutoCarry.Attack_Crosshair and _G.AutoCarry.Attack_Crosshair.target and _G.AutoCarry.Attack_Crosshair.target.type == myHero.type then return _G.AutoCarry.Attack_Crosshair.target end
-	return TargetSelector.target
+	if SelectedTarget ~= nil and ValidTarget(SelectedTarget, 1500) then
+		return SelectedTarget
+	end
+	TargetSelector:update()	
+	if TargetSelector.target and not TargetSelector.target.dead and TargetSelector.target.type == myHero.type then
+		return TargetSelector.target
+	else
+		return nil
+	end
 end
 
 function CastQ(unit)
@@ -188,8 +233,7 @@ function Skills()
 	SkillQ = { name = "Mystic Shot", range = 1150, delay = 0.25, speed = 2000, width = 60, ready = false }
 	SkillW = { name = "Essence Flux", range = 950, delay = 0.25, speed = 1600, width = 80, ready = false }
 	SkillR = { name = "Trueshot Barrage", range = math.huge, delay = 1.0, speed = 2000, width = 160, ready = false }
-	
-	VP = VPrediction()
+
 
 	lastSkin = 0
 	
@@ -236,9 +280,7 @@ function Menu()
 		Settings.drawing.lfc:addParam("Width", "Width", 4, 1, 1, 10, 0)
 	Settings:addSubMenu("["..myHero.charName.."] - Orbwalking Settings", "Orbwalking")
 		SxOrb:LoadToMenu(Settings.Orbwalking)
-	
-	TargetSelector = TargetSelector(TARGET_LESS_CAST_PRIORITY, SkillQ.range + 500, DAMAGE_PHYSICAL, false, true)
-	TargetSelector.name = "Ezreal"
+
 	Settings:addTS(TargetSelector)
 end
 
