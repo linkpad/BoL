@@ -1,6 +1,6 @@
 if myHero.charName ~= "Ezreal" then return end
 
-local Ez_version = 0.9
+local Ez_version = 1.0
 
 
 class "SxUpdate"
@@ -124,11 +124,11 @@ function OnTick()
 		Combo(Target)
 	end
 
-	if SxOrb.IsHarass or Settings.harass.toggle then
+	if SxOrb.IsHarass or Settings.harass.toggle or Settings.harass.key then
 		Harass(Target)
 	end
 
-	if SxOrb.IsLaneClear or Settings.laneclear.toggle then
+	if (SxOrb.IsLaneClear or Settings.laneclear.toggle or Settings.laneclear.key) and not ComboKey then
 		LaneClear()
 	end
 	
@@ -290,12 +290,14 @@ function Menu()
 		Settings.killsteal:addParam("useW", "Steal With (W)", SCRIPT_PARAM_ONOFF, true)
 
 	Settings:addSubMenu("["..myHero.charName.."] - Harass", "harass")
-		Settings.harass:addParam("toggle", "Toggle harass", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("L"))
+		Settings.harass:addParam("key", "Harass Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("C"))
+		Settings.harass:addParam("toggle", "Toggle Harass", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("L"))
 		Settings.harass:addParam("useQ", "Harass With (Q)", SCRIPT_PARAM_ONOFF, true)
 		Settings.harass:addParam("useW", "Harass With (W)", SCRIPT_PARAM_ONOFF, true)
 		Settings.harass:addParam("mManager", "Min. Mana To Harass", SCRIPT_PARAM_SLICE, 0, 0, 100, 0)
 
 	Settings:addSubMenu("["..myHero.charName.."] - Lane Clear", "laneclear")
+		Settings.laneclear:addParam("key", "Lane Clear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("X"))
 		Settings.laneclear:addParam("toggle", "Toggle Lane Clear", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("T"))
 		Settings.laneclear:addParam("useQ", "Lane Clear With (Q)", SCRIPT_PARAM_ONOFF, true)
 		Settings.laneclear:addParam("mManager", "Min. Mana To Lane Clear", SCRIPT_PARAM_SLICE, 0, 0, 100, 0)
