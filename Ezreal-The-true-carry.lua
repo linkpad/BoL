@@ -1,6 +1,6 @@
 if myHero.charName ~= "Ezreal" then return end
 
-local Ez_version = 0.7
+local Ez_version = 0.8
 
 
 class "SxUpdate"
@@ -109,6 +109,7 @@ function OnLoad()
         Menu()
 end
 
+
 function OnTick()
 	if ForceReload then return end
 	KillSteall()
@@ -123,14 +124,14 @@ function OnTick()
 		Combo(Target)
 	end
 
-	if SxOrb.IsHarass then
+	if SxOrb.IsHarass or Settings.harass.toggle then
 		Harass(Target)
 	end
 	
 end
 
 function Harass(unit)
-	if ValidTarget(unit) and unit ~= nil and unit.type == myHero.type then
+	if ValidTarget(unit) and unit ~= nil and unit.type == myHero.type and not IsMyManaLowHarass() then
 	
 		if Settings.harass.useQ then 
 			CastQ(unit)
@@ -173,6 +174,14 @@ function KillSteall()
 				CastQ(unit)
 			end
 	 end
+end
+
+function IsMyManaLowHarass()
+    if myHero.mana < (myHero.maxMana * ( Settings.harass.mManager / 100)) then
+        return true
+    else
+        return false
+    end
 end
 
 function Checks()
@@ -255,13 +264,16 @@ function Menu()
 		Settings.killsteal:addParam("useW", "Steal With (W)", SCRIPT_PARAM_ONOFF, true)
 
 	Settings:addSubMenu("["..myHero.charName.."] - Harass", "harass")
+		Settings.harass:addParam("toggle", "Toggle harass", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("L"))
 		Settings.harass:addParam("useQ", "Harass With (Q)", SCRIPT_PARAM_ONOFF, true)
 		Settings.harass:addParam("useW", "Harass With (W)", SCRIPT_PARAM_ONOFF, true)
+		Settings.harass:addParam("mManager", "Min. Mana To Harass", SCRIPT_PARAM_SLICE, 0, 0, 100, 0)
 		
 	Settings.combo:permaShow("comboKey")
 	Settings.combo:permaShow("RifKilable")
 	Settings.killsteal:permaShow("useQ")
 	Settings.killsteal:permaShow("useW")
+	Settings.harass:permaShow("toggle")
 	
 	
 	Settings:addSubMenu("["..myHero.charName.."] - Draw Settings", "drawing")	
@@ -278,6 +290,7 @@ function Menu()
 		Settings.drawing.lfc:addParam("lfc", "Lag Free Circles", SCRIPT_PARAM_ONOFF, false)
 		Settings.drawing.lfc:addParam("CL", "Quality", 4, 75, 75, 2000, 0)
 		Settings.drawing.lfc:addParam("Width", "Width", 4, 1, 1, 10, 0)
+
 	Settings:addSubMenu("["..myHero.charName.."] - Orbwalking Settings", "Orbwalking")
 		SxOrb:LoadToMenu(Settings.Orbwalking)
 
