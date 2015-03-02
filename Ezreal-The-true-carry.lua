@@ -1,6 +1,6 @@
 if myHero.charName ~= "Ezreal" then return end
 
-local Ez_version = 0.8
+local Ez_version = 0.9
 
 
 class "SxUpdate"
@@ -127,7 +127,24 @@ function OnTick()
 	if SxOrb.IsHarass or Settings.harass.toggle then
 		Harass(Target)
 	end
+
+	if SxOrb.IsLaneClear or Settings.laneclear.toggle then
+		LaneClear()
+	end
 	
+end
+
+function LaneClear()
+	enemyMinions:update()
+	if not IsMyManaLowLaneClear() then
+		for i, minion in pairs(enemyMinions.objects) do
+			if ValidTarget(minion) and minion ~= nil then
+				if Settings.laneclear.useQ and GetDistance(minion) <= SkillQ.range and SkillQ.ready then
+					CastSpell(_Q, minion.x, minion.z)
+				end
+			end		 
+		end
+	end
 end
 
 function Harass(unit)
@@ -174,6 +191,14 @@ function KillSteall()
 				CastQ(unit)
 			end
 	 end
+end
+
+function IsMyManaLowLaneClear()
+    if myHero.mana < (myHero.maxMana * ( Settings.laneclear.mManager / 100)) then
+        return true
+    else
+        return false
+    end
 end
 
 function IsMyManaLowHarass()
@@ -243,6 +268,7 @@ function Skills()
 	SkillW = { name = "Essence Flux", range = 950, delay = 0.25, speed = 1600, width = 80, ready = false }
 	SkillR = { name = "Trueshot Barrage", range = math.huge, delay = 1.0, speed = 2000, width = 160, ready = false }
 
+	enemyMinions = minionManager(MINION_ENEMY, SkillQ.range, myHero, MINION_SORT_HEALTH_ASC)
 
 	lastSkin = 0
 	
@@ -268,12 +294,18 @@ function Menu()
 		Settings.harass:addParam("useQ", "Harass With (Q)", SCRIPT_PARAM_ONOFF, true)
 		Settings.harass:addParam("useW", "Harass With (W)", SCRIPT_PARAM_ONOFF, true)
 		Settings.harass:addParam("mManager", "Min. Mana To Harass", SCRIPT_PARAM_SLICE, 0, 0, 100, 0)
+
+	Settings:addSubMenu("["..myHero.charName.."] - Lane Clear", "laneclear")
+		Settings.laneclear:addParam("toggle", "Toggle Lane Clear", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("T"))
+		Settings.laneclear:addParam("useQ", "Lane Clear With (Q)", SCRIPT_PARAM_ONOFF, true)
+		Settings.laneclear:addParam("mManager", "Min. Mana To Lane Clear", SCRIPT_PARAM_SLICE, 0, 0, 100, 0)
 		
 	Settings.combo:permaShow("comboKey")
 	Settings.combo:permaShow("RifKilable")
 	Settings.killsteal:permaShow("useQ")
 	Settings.killsteal:permaShow("useW")
 	Settings.harass:permaShow("toggle")
+	Settings.laneclear:permaShow("toggle")
 	
 	
 	Settings:addSubMenu("["..myHero.charName.."] - Draw Settings", "drawing")	
