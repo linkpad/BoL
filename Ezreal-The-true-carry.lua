@@ -1,6 +1,6 @@
 if myHero.charName ~= "Ezreal" then return end
 
-local Ez_version = 1.0
+local Ez_version = 1.1
 
 
 class "SxUpdate"
@@ -319,6 +319,7 @@ function Menu()
 		Settings.drawing:addParam("wDraw", "Draw "..SkillW.name.." (W) Range", SCRIPT_PARAM_ONOFF, true)
 		Settings.drawing:addParam("wColor", "Draw "..SkillW.name.." (W) Color", SCRIPT_PARAM_COLOR, {255, 100, 44, 255})
 		Settings.drawing:addParam("tColor", "Draw Target Color", SCRIPT_PARAM_COLOR, {255, 100, 44, 255})
+		Settings.drawing:addParam("tText", "Draw Current Target Text", SCRIPT_PARAM_ONOFF, true)
 
 	Settings.drawing:addSubMenu("Lag Free Circles", "lfc")	
 		Settings.drawing.lfc:addParam("lfc", "Lag Free Circles", SCRIPT_PARAM_ONOFF, false)
@@ -345,7 +346,10 @@ function OnDraw()
 			DrawCircle(myHero.x, myHero.y, myHero.z, myHero.range + GetDistance(myHero, myHero.minBBox), RGB(Settings.drawing.myColor[2], Settings.drawing.myColor[3], Settings.drawing.myColor[4]))
 		end
 
-		if Target ~= nil then
+		if Target ~= nil and ValidTarget(Target) then
+			if Settings.drawing.tText then
+				DrawText3D("Current Target",Target.x-100, Target.y-50, Target.z, 20, 0xFFFFFF00)
+			end
 			DrawCircle(Target.x, Target.y, Target.z, 200, RGB(Settings.drawing.tColor[2], Settings.drawing.tColor[3], Settings.drawing.tColor[4]))
 		end
 	end
