@@ -177,7 +177,7 @@ end
 
 function CheckScriptUpdate()
 	local ToUpdate = {}
-    ToUpdate.Version = 1.2
+    ToUpdate.Version = 1.3
     ToUpdate.UseHttps = true
 	ToUpdate.Name = "Ezreal - The true carry"
     ToUpdate.Host = "raw.githubusercontent.com"
@@ -394,10 +394,53 @@ function CastR(unit)
 	end
 end
 
+function OnProcessSpell(unit, spell)
+	if table.contains(GapCloserList, spell.name) and Settings.antigap.useE then
+		if (spell and spell.target and spell.target.isMe or GetDistance(spell.endPos or Geometry.Vector3(0,0,0) <= myHero.boundingRadius + 10)) then 
+			local jmpToPos = Target + (Vector(myHero) - Target):normalized() * 2000
+			CastSpell(_E, jmpToPos.x , jmpToPos.z)
+		end
+	end
+end
+
 function Skills()
 	SkillQ = { name = "Mystic Shot", range = 1150, delay = 0.25, speed = 2000, width = 60, ready = false }
 	SkillW = { name = "Essence Flux", range = 950, delay = 0.25, speed = 1600, width = 80, ready = false }
+	SkillE = { name = "Arcane Shift", range = 475, delay = nil, speed = nil, width = nil, ready = false }
 	SkillR = { name = "Trueshot Barrage", range = math.huge, delay = 1.0, speed = 2000, width = 160, ready = false }
+
+	GapCloserList = {
+			"LeonaZenithBlade",
+			"AatroxQ",
+			"AkaliShadowDance",
+			"Headbutt",
+			"FioraQ",
+			"DianaTeleport",
+			"EliseSpiderQCast",
+			"FizzPiercingStrike",
+			"GragasE",
+			"HecarimUlt",
+			"JarvanIVDragonStrike",
+			"IreliaGatotsu",
+			"JaxLeapStrike",
+			"KhazixE",
+			"khazixelong",
+			"LeblancSlide",
+			"LeblancSlideM",
+			"BlindMonkQTwo",
+			"LeonaZenithBlade",
+			"UFSlash",
+			"Pantheon_LeapBash",
+			"PoppyHeroicCharge",
+			"RenektonSliceAndDice",
+			"RivenTriCleave",
+			"SejuaniArcticAssault",
+			"slashCast",
+			"ViQ",
+			"MonkeyKingNimbus",
+			"XenZhaoSweep",
+			"YasuoDashWrapper"
+		}
 
 	enemyMinions = minionManager(MINION_ENEMY, SkillQ.range, myHero, MINION_SORT_HEALTH_ASC)
 
@@ -416,6 +459,9 @@ function Menu()
 		Settings.combo:addParam("useW", "Use (W) in Combo", SCRIPT_PARAM_ONOFF, true)
 		Settings.combo:addParam("RifKilable", "Use (R) if enemy is kilable", SCRIPT_PARAM_ONOFF, true)
 		
+	Settings:addSubMenu("["..myHero.charName.."] - AntiGap Closer", "antigap")
+		Settings.antigap:addParam("useE", "Use (E)", SCRIPT_PARAM_ONOFF, true)
+
 	Settings:addSubMenu("["..myHero.charName.."] - KillSteal", "killsteal")
 		Settings.killsteal:addParam("useQ", "Steal With (Q)", SCRIPT_PARAM_ONOFF, true)
 		Settings.killsteal:addParam("useW", "Steal With (W)", SCRIPT_PARAM_ONOFF, true)
@@ -470,6 +516,7 @@ end
 
 function OnDraw()
 	if inload then return end
+
 	if not myHero.dead and not Settings.drawing.mDraw then
 		if SkillQ.ready and Settings.drawing.qDraw then 
 			DrawCircle(myHero.x, myHero.y, myHero.z, SkillQ.range, RGB(Settings.drawing.qColor[2], Settings.drawing.qColor[3], Settings.drawing.qColor[4]))
