@@ -95,7 +95,7 @@ end
 
 function checkUpdate()
 	local ToUpdate = {}
-	ToUpdate.Version = 0.2
+	ToUpdate.Version = 0.3
 	ToUpdate.Name = "Auth"
 	ToUpdate.Host = "raw.githubusercontent.com"
 	ToUpdate.VersionPath = "/linkpad/BoL/master/autoupdate.version"
@@ -111,5 +111,5 @@ end
 function OnLoad()
 	checkUpdate()
 
-	print('This is the second version')
+	print('This is the third version')
 end
