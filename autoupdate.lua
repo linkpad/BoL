@@ -83,7 +83,7 @@ function AutoUpdate:downloadUpdate()
 		    self.callbackError()
 		else
 			self.File = self.File:sub(ContentStart + 1,ContentEnd-1)
-			local f = io.open(self.SavePath,"w+b")
+			local f = io.open(self.savePath,"w+b")
 			f:write(self.File)
 			f:close()
 			self.CallbackUpdate(self.onlineVersion, self.localVersion)
