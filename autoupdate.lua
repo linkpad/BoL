@@ -51,7 +51,7 @@ function AutoUpdate:getVersion()
 			self.onlineVersion = tonumber(self.File:sub(ContentStart + 1,ContentEnd-1))
 			if self.onlineVersion > self.localVersion then
 				self.callbackNewVersion(self.onlineVersion)
-				self:createSocket(self.ScriptPath)
+				self:createSocket(self.scriptPath)
 				self.DownloadStatus = 'Connect to Server for ScriptDownload'
 				AddTickCallback(function() self:downloadUpdate() end)
 
@@ -105,7 +105,7 @@ end
 
 function checkUpdate()
 	local ToUpdate = {}
-	ToUpdate.Version = 0.2
+	ToUpdate.Version = 0.1
 	ToUpdate.Name = "Auth"
 	ToUpdate.Host = "raw.githubusercontent.com"
 	ToUpdate.VersionPath = "/linkpad/BoL/master/autoupdate.version"
@@ -121,5 +121,5 @@ end
 function OnLoad()
 	checkUpdate()
 
-	print('This is the second version')
+	print('This is the first version')
 end
