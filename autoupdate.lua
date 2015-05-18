@@ -86,7 +86,7 @@ function AutoUpdate:downloadUpdate()
 			local f = io.open(self.savePath,"w+b")
 			f:write(self.File)
 			f:close()
-			self.CallbackUpdate(self.onlineVersion, self.localVersion)
+			self.callbackUpdate(self.onlineVersion, self.localVersion)
 		end
 		self.gotScriptUpdate = true
 
