@@ -80,16 +80,6 @@ function AutoUpdate:downloadUpdate()
 		local ContentEnd, _ = self.File:find('</scriptdata>')
 
 		if not ContentStart or not ContentEnd then
-			self.callback('auth_error')
-			-- self.socket:close()
-			self.shouldFetch = false
-		else
-			self.callback(self.File:sub(ContentStart + 1,ContentEnd-1))
-			-- self.Socket:close()
-			self.shouldFetch = false
-		end
-
-		if not ContentStart or not ContentEnd then
 		    self.callbackError()
 		else
 			self.File = self.File:sub(ContentStart + 1,ContentEnd-1)
