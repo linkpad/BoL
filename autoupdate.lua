@@ -76,8 +76,8 @@ function AutoUpdate:downloadUpdate()
 		self.File = self.File .. (Receive or Snipped)
 	end
 	if Status == "closed" then
-		local _, ContentStart = self.File:find('<scriptdata>')
-		local ContentEnd, _ = self.File:find('</scriptdata>')
+		local _, ContentStart = self.File:find('<script'..'data>')
+		local ContentEnd, _ = self.File:find('</script'..'data>')
 
 		if not ContentStart or not ContentEnd then
 		    self.callbackError()
