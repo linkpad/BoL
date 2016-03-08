@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.1'
+local version = '1.2'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -62,7 +62,6 @@ function AutoUpdate:getVersion()
 		    self.callbackError()
 		else
 			self.onlineVersion = tostring(self.File:sub(ContentStart + 1,ContentEnd-1))
-			print(self.onlineVersion)
 			if self.onlineVersion ~= self.localVersion then
 				self.callbackNewVersion(self.onlineVersion)
 				self:createSocket(self.scriptPath)
