@@ -262,6 +262,10 @@ function MenuConfig:CheckSprite()
 	"skull.png",
 	"alert.png" }
 
+	 if not MakeSurePathExists(SPRITE_PATH .. "MenuConfig\\") then
+	 	CreateDirectory(SPRITE_PATH .. "MenuConfig\\")
+	 end
+
 
 	for _, _sprite in pairs(sprite) do
 		location = SPRITE_PATH .. "MenuConfig\\" .. _sprite
