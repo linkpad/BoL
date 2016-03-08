@@ -220,14 +220,66 @@ function MenuConfig:checkUpdate()
 	ToUpdate.ScriptPath =  "/linkpad/BoL/master/Common/MenuConfig.lua"
 	ToUpdate.SavePath = SCRIPT_PATH .."/Common/MenuConfig.lua"
 	ToUpdate.CallbackUpdate = function(NewVersion,OldVersion) print("<font color=\"#FF794C\"><b>" .. ToUpdate.Name .. ": </b></font> <font color=\"#FFDFBF\">Updated to "..NewVersion..". Please Reload with 2x F9</b></font>") end
-	ToUpdate.CallbackNoUpdate = function() print("<font color=\"#FF794C\"><b>" .. ToUpdate.Name .. ": </b></font> <font color=\"#FFDFBF\">No Updates Found</b></font>") end
+	ToUpdate.CallbackNoUpdate = function()  end
 	ToUpdate.CallbackNewVersion = function(NewVersion) print("<font color=\"#FF794C\"><b>" .. ToUpdate.Name .. ": </b></font> <font color=\"#FFDFBF\">New Version found ("..NewVersion.."). Please wait until its downloaded</b></font>") end
 	ToUpdate.CallbackError = function(NewVersion) print("<font color=\"#FF794C\"><b>" .. ToUpdate.Name .. ": </b></font> <font color=\"#FFDFBF\">Error while Downloading. Please try again.</b></font>") end
 	AutoUpdate(ToUpdate.Version, ToUpdate.Host, ToUpdate.VersionPath, ToUpdate.ScriptPath, ToUpdate.SavePath, ToUpdate.CallbackUpdate,ToUpdate.CallbackNoUpdate, ToUpdate.CallbackNewVersion,ToUpdate.CallbackError)
 end
 
+function MenuConfig:CheckSprite()
+
+	self.updatingSprite = false
+	self.endDownload = false
+	self.madeUpdate = false
+
+	sprite = { "cogwheel.png", 
+	"eye-open.png",
+	"flag.png",
+	"info-sign.png",
+	"keyboard.png",
+	"menu-hamburger.png",
+	"mouse.png",
+	"target.png",
+	"user.png",
+	"chevron-right.png",
+	"ok.png",
+	"remove.png",
+	"activated.png",
+	"deactivated.png",
+	"arrow-right.png",
+	"eyedropper.png",
+	"list.png",
+	"adjust-alt.png",
+	"bug.png",
+	"clock.png",
+	"cup.png",
+	"eye-close.png",
+	"gamepad.png",
+	"heart.png",
+	"leaf.png",
+	"riflescope.png",
+	"shield.png",
+	"skull.png",
+	"alert.png" }
+
+
+	for _, _sprite in pairs(sprite) do
+		location = SPRITE_PATH .. "MenuConfig\\" .. _sprite
+		if not FileExist(location) then
+			self.madeUpdate = true
+			DownloadFile("https://raw.githubusercontent.com/linkpad/BoL/master/Sprites/MenuConfig/".. _sprite .."?rand="..math.random(1,10000), location, function() self.updatingSprite = false end)
+		    if not self.updatingSprite then
+		    	self.updatingSprite = true
+		    	print("<font color=\"#FF794C\"><b>MenuConfig: </b></font> <font color=\"#FFDFBF\">Downloading sprite...</b></font>")
+		    end
+		end
+	end
+
+end
+
 function MenuConfig:InitComponents()
 	self:checkUpdate()
+	self:CheckSprite()
 
     self.cogwheelSprite = createSprite('MenuConfig\\cogwheel.png')
     self.eyeopenSprite = createSprite('MenuConfig\\eye-open.png')
@@ -690,6 +742,11 @@ function MenuConfig:OnTick()
 
     local cursor = GetCursorPos()
     self.pos = { x = cursor.x, y = cursor.y }
+
+    if not self.updatingSprite and not self.endDownload and self.madeUpdate then
+    	print("<font color=\"#FF794C\"><b>MenuConfig: </b></font> <font color=\"#FFDFBF\">Download finished.</b></font>")
+    	self.endDownload = true
+    end
 
     if self.mousedown then
     	for _, menu in pairs(globalMenu) do
