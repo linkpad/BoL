@@ -230,8 +230,8 @@ function MenuConfig:checkUpdate()
 	ToUpdate.Version = version
 	ToUpdate.Name = "MenuConfig"
 	ToUpdate.Host = "http://raw.githubusercontent.com"
-	ToUpdate.VersionPath = "/linkpad/BoL/master/Common/MenuConfig.version"
-	ToUpdate.ScriptPath =  "/linkpad/BoL/master/Common/MenuConfig.lua"
+	ToUpdate.VersionPath = "/linkpad/BoL/master/Common/MenuConfig.version" .."?rand="..math.random(1, 10000)
+	ToUpdate.ScriptPath =  "/linkpad/BoL/master/Common/MenuConfig.lua" .."?rand="..math.random(1, 10000)
 	ToUpdate.SavePath = SCRIPT_PATH .."/Common/MenuConfig.lua"
 	ToUpdate.CallbackUpdate = function(NewVersion,OldVersion) print("<font color=\"#FF794C\"><b>" .. ToUpdate.Name .. ": </b></font> <font color=\"#FFDFBF\">Updated to "..NewVersion..". Please Reload with 2x F9</b></font>") end
 	ToUpdate.CallbackNoUpdate = function()  end
