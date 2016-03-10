@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.2'
+local version = '1.3'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -11,6 +11,7 @@ local MenuStartHeight = 25
 local MenuTextSize = 15
 local GlobalVar = { }
 local GlobalId = 0
+local menuconf
 
 class 'AutoUpdate'
 function AutoUpdate:__init(localVersion, host, versionPath, scriptPath, savePath, callbackUpdate, callbackNoUpdate, callbackNewVersion, callbackError)
@@ -114,6 +115,17 @@ function printDebug(_text)
 	end
 end
 
+function addSettings()
+    -- Add Menuconfig option
+    menuconf = MenuConfig("__menuconfig_option__", "MenuConfig - Settings")
+    menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
+    menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
+    menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
+    menuconf:Info("Version: 1.3", "leaf")
+    menuconf:Info("Author: Linkpad - AuroraScripters")
+    menuconf:Info("Updated: 10/03/2016", "clock")
+end
+
 function MenuConfig:__init(_header, _name, _parent, _icon)
 	UpdateWindow()
 
@@ -128,6 +140,8 @@ function MenuConfig:__init(_header, _name, _parent, _icon)
 	    self.mousedown = false
 
 	    GlobalVar.MenuStartWidth = 250
+
+	    addSettings()
 	end
 
 	if _parent == nil then
@@ -146,7 +160,7 @@ function MenuConfig:__init(_header, _name, _parent, _icon)
 		self.menu.y = MenuStartY
 		self.menu.open = false
 		self.menu.suby = 0
-		self.menu.subx = MenuStartX
+		self.menu.subx = MenuStartX + GlobalVar.MenuStartWidth + 10
 
 		MenuStartY = MenuStartY + MenuStartHeight
 		result = self:CalculateWidth(_name)
@@ -790,7 +804,7 @@ function MenuConfig:Msg(Msg, Key)
 
     local pressed = false
 
-    if Msg == WM_LBUTTONDOWN and not pressed then
+    if Msg == WM_LBUTTONDOWN and not pressed and not menuconf.togglemenu then
         printDebug("press button at x : " .. self.pos.x .. " y : " .. self.pos.y)
         self:CursorOnMenu()
         pressed = true
@@ -1151,14 +1165,16 @@ end
 
 function MenuConfig:DrawOpenMenuButton()
 
-    DrawRectangle(self.OpenMenuButtonX - 5, self.OpenMenuButtonY - 5, self.OpenMenuButtonWidth + 10, self.OpenMenuButtonHeight + 10, ARGB(70,0,0,0))
-    DrawRectangle(self.OpenMenuButtonX, self.OpenMenuButtonY, self.OpenMenuButtonWidth, self.OpenMenuButtonHeight, ARGB(140,0,0,0))
+	if not menuconf.togglemenu then
+    	DrawRectangle(self.OpenMenuButtonX - 5, self.OpenMenuButtonY - 5, self.OpenMenuButtonWidth + 10, self.OpenMenuButtonHeight + 10, ARGB(70,0,0,0))
+    	DrawRectangle(self.OpenMenuButtonX, self.OpenMenuButtonY, self.OpenMenuButtonWidth, self.OpenMenuButtonHeight, ARGB(140,0,0,0))
 
-    self:DrawTextIcon("menu-hamburger", self.OpenMenuButtonText, self.OpenMenuButtonTextSize, self.OpenMenuButtonTextX + self.OpenMenuButtonX, self.OpenMenuButtonTextY + self.OpenMenuButtonY, ARGB(255,255,255,255))
+    	self:DrawTextIcon("menu-hamburger", self.OpenMenuButtonText, self.OpenMenuButtonTextSize, self.OpenMenuButtonTextX + self.OpenMenuButtonX, self.OpenMenuButtonTextY + self.OpenMenuButtonY, ARGB(255,255,255,255))
+    end
 end
 
 function MenuConfig:DrawMenu()
-	if not self.MenuConfigOpen then return end
+	if not self.MenuConfigOpen or menuconf.togglemenu then return end
 
 	-- Draw top and bottom border
 	DrawRectangle(MenuStartX - 5, 60 - 5, GlobalVar.MenuStartWidth + 10, 5, ARGB(70,0,0,0))
@@ -1171,7 +1187,11 @@ function MenuConfig:DrawMenu()
 	-- Draw menu
 	for _, menu in pairs(globalMenu) do
 		if menu.depth == 0 then
-	    	self:DrawMenuTitle(menu.name, "menu-hamburger", menu.x, menu.y, GlobalVar.MenuStartWidth, MenuStartHeight, menu.open)
+			if menu.header == "__menuconfig_option__" then
+	    		self:DrawMenuTitle(menu.name, "cogwheel", menu.x, menu.y, GlobalVar.MenuStartWidth, MenuStartHeight, menu.open)
+	    	else
+	    		self:DrawMenuTitle(menu.name, "menu-hamburger", menu.x, menu.y, GlobalVar.MenuStartWidth, MenuStartHeight, menu.open)
+	    	end
 	    end
 
 	    -- draw submenu
