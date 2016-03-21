@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.3'
+local version = '1.4'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -121,9 +121,9 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.3", "leaf")
+    menuconf:Info("Version: 1.4", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
-    menuconf:Info("Updated: 10/03/2016", "clock")
+    menuconf:Info("Updated: 21/03/2016", "clock")
 end
 
 function MenuConfig:__init(_header, _name, _parent, _icon)
@@ -654,7 +654,7 @@ function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback)
 	end
 
 	dropdown.instance = self
-	dropdown.instance[_header] = _value
+	dropdown.instance[_header] = dropdown.dropid
 
 	table.insert(self.menu.submenu, dropdown)
 end
