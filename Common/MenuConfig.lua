@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.4'
+local version = '1.5'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -121,7 +121,7 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.4", "leaf")
+    menuconf:Info("Version: 1.5", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
     menuconf:Info("Updated: 21/03/2016", "clock")
 end
@@ -387,6 +387,7 @@ function MenuConfig:Save()
 	if not GetSave("MenuConfig")[self.menu.main] then GetSave("MenuConfig")[self.menu.main] = {} end
 	table.clear(GetSave("MenuConfig")[self.menu.main])
 	table.merge(GetSave("MenuConfig")[self.menu.main], content, true)
+	GetSave("MenuConfig"):Save()
 
 end
 
@@ -659,7 +660,7 @@ function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback)
 	table.insert(self.menu.submenu, dropdown)
 end
 
-function MenuConfig:Boolean(_header, _text, _value)
+function MenuConfig:Boolean(_header, _text, _value, _callback)
 	boolean = {}
 	boolean.header = _header
 	GlobalId = GlobalId + 1
@@ -667,6 +668,7 @@ function MenuConfig:Boolean(_header, _text, _value)
 	boolean.parent = self.menu
 	boolean.isboolean = true
 	boolean.name = _text
+	boolean.callback = _callback
 	boolean.x = self.menu.subx + self.menu.subwidth + 10
 	boolean.y = self.menu.y + self.menu.suby
 	result = self:CalculateWidth(boolean.name)
@@ -692,7 +694,17 @@ function MenuConfig:Boolean(_header, _text, _value)
 	boolean.save = function() self:Save() end
 
 	table.insert(self.menu.submenu, boolean)
+end
 
+function MenuConfig:Set(_header, _value)
+	for _, menu in pairs(self.menu.submenu) do
+		if menu.header == _header then
+			if menu.isboolean then
+				menu.status = _value
+				menu.instance[menu.header] = menu.status
+			end
+		end
+	end
 end
 
 function MenuConfig:Info(_text, _icon)
@@ -977,11 +989,17 @@ function MenuConfig:CursorOnMenu()
 			            			    _menu.status = true
 			            			    _menu.save()
 			            			    _menu.instance[_menu.header] = _menu.status
+	                					if _menu.callback ~= nil then
+	            							_menu.callback(_menu.status)
+	            						end
 			            			elseif _menu.status then
 			            			    printDebug("you deactivated " .. _menu.name)
 			            			    _menu.status = false
 			            			    _menu.save()
 			            			    _menu.instance[_menu.header] = _menu.status
+			        					if _menu.callback ~= nil then
+			    							_menu.callback(_menu.status)
+			    						end
 			            			end
 			            		end
 			            	end
