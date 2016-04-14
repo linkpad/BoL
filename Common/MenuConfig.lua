@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.5'
+local version = '1.6'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -474,7 +474,7 @@ function MenuConfig:KeyToggle(_header, _text, _key)
 	table.insert(self.menu.submenu, keytoggle)
 end
 
-function MenuConfig:TargetSelector(_header, _text, _mode, _range, _dmgtype, _targetselected, _enemyteam)
+function MenuConfig:TargetSelector(_header, _text, _mode, _range, _dmgtype, _targetselected, _enemyteam, _createsubmenu)
 	targetselector = {}
 	targetselector.header = _header
 	GlobalId = GlobalId + 1
@@ -484,23 +484,39 @@ function MenuConfig:TargetSelector(_header, _text, _mode, _range, _dmgtype, _tar
 
 	ts = TargetSelector(_mode, _range, _dmgtype, _targetselected, _enemyteam)
 
-	targetselector.instance = self
-	targetselector.instance[_header] = ts
+	if _createsubmenu == nil then
+		_createsubmenu = true
+	end
 
-
-	if GetSave("MenuConfig")[self.menu.main] then
-		if  GetSave("MenuConfig")[self.menu.main]["__tsmenu"] then
-			if GetSave("MenuConfig")[self.menu.main]["__tsmenu"]["__tsmode"] then
-				ts.mode = GetSave("MenuConfig")[self.menu.main]["__tsmenu"]["__tsmode"].dropid
+	if not _createsubmenu then
+		if GetSave("MenuConfig")[self.menu.main] then
+			if GetSave("MenuConfig")[self.menu.main][self.menu.header][_header .. "__tsmode"] then
+				ts.mode = GetSave("MenuConfig")[self.menu.main][self.menu.header][_header .. "__tsmode"].dropid
+			end
+		end
+	else
+		if GetSave("MenuConfig")[self.menu.main] then
+			if  GetSave("MenuConfig")[self.menu.main][_header .. "__tsmenu"] then
+				if GetSave("MenuConfig")[self.menu.main][_header .. "__tsmenu"][_header .. "__tsmode"] then
+					ts.mode = GetSave("MenuConfig")[self.menu.main][_header .. "__tsmenu"][_header .. "__tsmode"].dropid
+				end
 			end
 		end
 	end
 
+	targetselector.instance = self
+	targetselector.instance[_header] = ts
+
 	callback = function(id) self:Tsmodechange(id, ts) end
 
-	self:Menu("__tsmenu", _text)
-	self.__tsmenu:DropDown("__tsmode", "Target Selector mode:", ts.mode, { "Low HP", "Most AP", "Most AD", "Less Cast", "Near Mouse", "Priority", "Low HP Priority", "Less Cast Priority", "Dead", "Closest" }, callback)
+	name = _header .. "__tsmenu"
 
+	if not _createsubmenu then
+		self:DropDown(_header .. "__tsmode", _text, ts.mode, { "Low HP", "Most AP", "Most AD", "Less Cast", "Near Mouse", "Priority", "Low HP Priority", "Less Cast Priority", "Dead", "Closest" }, callback)
+	else
+		self:Menu(name, _text)
+		self[name]:DropDown(_header .. "__tsmode", "Target Selector mode:", ts.mode, { "Low HP", "Most AP", "Most AD", "Less Cast", "Near Mouse", "Priority", "Low HP Priority", "Less Cast Priority", "Dead", "Closest" }, callback)
+	end
 end
 
 function MenuConfig:Tsmodechange(id, ts)
