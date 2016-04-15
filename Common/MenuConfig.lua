@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.6'
+local version = '1.6.1'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -121,7 +121,7 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.5", "leaf")
+    menuconf:Info("Version: 1.6.1", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
     menuconf:Info("Updated: 21/03/2016", "clock")
 end
@@ -490,8 +490,10 @@ function MenuConfig:TargetSelector(_header, _text, _mode, _range, _dmgtype, _tar
 
 	if not _createsubmenu then
 		if GetSave("MenuConfig")[self.menu.main] then
-			if GetSave("MenuConfig")[self.menu.main][self.menu.header][_header .. "__tsmode"] then
-				ts.mode = GetSave("MenuConfig")[self.menu.main][self.menu.header][_header .. "__tsmode"].dropid
+			if GetSave("MenuConfig")[self.menu.main][self.menu.header] then
+				if GetSave("MenuConfig")[self.menu.main][self.menu.header][_header .. "__tsmode"] then
+					ts.mode = GetSave("MenuConfig")[self.menu.main][self.menu.header][_header .. "__tsmode"].dropid
+				end
 			end
 		end
 	else
