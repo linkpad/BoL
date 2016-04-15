@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.6.2'
+local version = '1.6.3'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -121,7 +121,7 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.6.2", "leaf")
+    menuconf:Info("Version: 1.6.3", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
     menuconf:Info("Updated: 15/04/2016", "clock")
 end
@@ -290,6 +290,21 @@ function MenuConfig:CheckSprite()
 		    	self.updatingSprite = true
 		    	print("<font color=\"#FF794C\"><b>MenuConfig: </b></font> <font color=\"#FFDFBF\">Downloading sprite...</b></font>")
 		    end
+		end
+	end
+
+
+	-- check colorpicker sprites
+
+	if not MakeSurePathExists(SPRITE_PATH .. "WebSprites\\") then
+		CreateDirectory(SPRITE_PATH .. "WebSprites\\")
+	end
+
+	if not FileExist(SPRITE_PATH .. "WebSprites\\bol-cp.png") then
+		DownloadFile("https://raw.githubusercontent.com/linkpad/BoL/master/Sprites/MenuConfig/bol-cp.png?rand="..math.random(1,10000), location, function() self.updatingSprite = false end)
+		if not self.updatingSprite then
+			self.updatingSprite = true
+			print("<font color=\"#FF794C\"><b>MenuConfig: </b></font> <font color=\"#FFDFBF\">Downloading sprite...</b></font>")
 		end
 	end
 
