@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.6.3'
+local version = '1.7'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -12,6 +12,7 @@ local MenuTextSize = 15
 local GlobalVar = { }
 local GlobalId = 0
 local menuconf
+local menuts
 
 class 'AutoUpdate'
 function AutoUpdate:__init(localVersion, host, versionPath, scriptPath, savePath, callbackUpdate, callbackNoUpdate, callbackNewVersion, callbackError)
@@ -121,9 +122,44 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.6.3", "leaf")
+    menuconf:Info("Version: 1.7", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
     menuconf:Info("Updated: 15/04/2016", "clock")
+end
+
+function addTargetSelector()
+	-- Add targetselector menu
+	menuts = MenuConfig("__menuconfig_targetselector__", "Target Selector")
+	menuts:Section("Champion Priority")
+	-- Get all ennemy
+	enemy = GetEnemyHeroes()
+	countenemy = #enemy
+	countstart = 0
+	dropdowntable = {}
+	while countstart < countenemy do
+		countstart = countstart + 1
+		table.insert(dropdowntable, tostring(countstart))
+	end
+
+	for i, hero in pairs(enemy) do
+		menuts:DropDown("menuts_" .. hero.charName, hero.charName, 1, dropdowntable, function(data) updateTargetSelectorPriority() end, false, function() updateTargetSelectorDropDown() end)
+	end
+
+	menuts:Info("1 is the highest priority")
+end
+
+function updateTargetSelectorPriority()
+	enemy = GetEnemyHeroes()
+	for i, hero in pairs(enemy) do
+		TS_SetHeroPriority(menuts["menuts_" .. hero.charName], hero)   
+	end
+end
+
+function updateTargetSelectorDropDown()
+	enemy = GetEnemyHeroes()
+	for i, hero in pairs(enemy) do
+		menuts:Set("menuts_" .. hero.charName, TS_GetPriority(hero))
+	end
 end
 
 function MenuConfig:__init(_header, _name, _parent, _icon)
@@ -142,6 +178,7 @@ function MenuConfig:__init(_header, _name, _parent, _icon)
 	    GlobalVar.MenuStartWidth = 250
 
 	    addSettings()
+	    addTargetSelector()
 	end
 
 	if _parent == nil then
@@ -625,7 +662,7 @@ function MenuConfig:Slider(_header, _text, _value, _minvalue, _maxvalue, _step)
 	table.insert(self.menu.submenu, slider)
 end
 
-function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback)
+function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback, _allowsave, _callbackMenuClick)
 	dropdown = {}
 	dropdown.header = _header
 	GlobalId = GlobalId + 1
@@ -637,6 +674,7 @@ function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback)
 	dropdown.open = false
 	dropdown.subwidth = 100
 	dropdown.callback = _callback
+	dropdown.callbackMenuClick = _callbackMenuClick
 
 	countid = 0
 	dropdown.suby = 0
@@ -654,10 +692,12 @@ function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback)
 
 	dropdown.dropid = _value
 
-	if GetSave("MenuConfig")[self.menu.main] then
-		if  GetSave("MenuConfig")[self.menu.main][self.menu.header] then
-			if GetSave("MenuConfig")[self.menu.main][self.menu.header][_header] then
-				dropdown.dropid = GetSave("MenuConfig")[self.menu.main][self.menu.header][_header].dropid
+	if _allowsave == nil or _allowsave == true then
+		if GetSave("MenuConfig")[self.menu.main] then
+			if  GetSave("MenuConfig")[self.menu.main][self.menu.header] then
+				if GetSave("MenuConfig")[self.menu.main][self.menu.header][_header] then
+					dropdown.dropid = GetSave("MenuConfig")[self.menu.main][self.menu.header][_header].dropid
+				end
 			end
 		end
 	end
@@ -735,6 +775,19 @@ function MenuConfig:Set(_header, _value)
 			if menu.isboolean then
 				menu.status = _value
 				menu.instance[menu.header] = menu.status
+			end
+
+			if menu.isdropdown then
+				-- print("try to set dropdown value to " .. _value)
+				menu.dropid = _value
+				menu.instance[menu.header] = menu.dropid
+				for _, dropmenu in pairs(menu.droptable) do
+					if dropmenu.id == menu.dropid then
+						dropmenu.selected = true
+					else
+						dropmenu.selected = false
+					end
+				end
 			end
 		end
 	end
@@ -1147,6 +1200,9 @@ function MenuConfig:CursorOnMenu()
 			            		if _menu.parent == menu then
 			            			if not _menu.open then 
 			            			    printDebug("you open " .. _menu.name)
+			            			    if _menu.callbackMenuClick ~= nil then
+			            			    	_menu.callbackMenuClick()
+			            			    end
 		                			    for _, _submenu in pairs(_menu.parent.submenu) do
 		                			    	if not _submenu.ismenu and _submenu.open then
 	    	            			    		_submenu.open = false
@@ -1240,8 +1296,10 @@ function MenuConfig:DrawMenu()
 		if menu.depth == 0 then
 			if menu.header == "__menuconfig_option__" then
 	    		self:DrawMenuTitle(menu.name, "cogwheel", menu.x, menu.y, GlobalVar.MenuStartWidth, MenuStartHeight, menu.open)
+	    	elseif menu.header == "__menuconfig_targetselector__" then
+	    		self:DrawMenuTitle(menu.name, "target", menu.x, menu.y, GlobalVar.MenuStartWidth, MenuStartHeight, menu.open)
 	    	else
-	    		self:DrawMenuTitle(menu.name, "menu-hamburger", menu.x, menu.y, GlobalVar.MenuStartWidth, MenuStartHeight, menu.open)
+	    		self:DrawMenuTitle(menu.name, "menu-hamburger", menu.x, menu.y, GlobalVar.MenuStartWidth, MenuStartHeight, menu.open)	
 	    	end
 	    end
 
