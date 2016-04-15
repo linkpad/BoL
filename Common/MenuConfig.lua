@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.6.1'
+local version = '1.6.2'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -121,9 +121,9 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.6.1", "leaf")
+    menuconf:Info("Version: 1.6.2", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
-    menuconf:Info("Updated: 21/03/2016", "clock")
+    menuconf:Info("Updated: 15/04/2016", "clock")
 end
 
 function MenuConfig:__init(_header, _name, _parent, _icon)
