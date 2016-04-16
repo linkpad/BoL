@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.7'
+local version = '1.8'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -122,9 +122,9 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.7", "leaf")
+    menuconf:Info("Version: 1.8", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
-    menuconf:Info("Updated: 15/04/2016", "clock")
+    menuconf:Info("Updated: 16/04/2016", "clock")
 end
 
 function addTargetSelector()
@@ -576,6 +576,44 @@ end
 function MenuConfig:Tsmodechange(id, ts)
 	printDebug("ts mode changed to id " .. id)
 	ts.mode = id
+end
+
+function MenuConfig:AddLogo(_header, _sprite, _scale, _paddingtop, _paddingright, _paddingbottom, _paddingleft)
+	if _sprite.width > 250 or _sprite.height > 250 then
+		print("the size of the sprite should be 250x250 max.")
+		return
+	end
+
+	_scale = _scale or 1
+	_paddingtop = _paddingtop or 0
+	_paddingright = _paddingright or 0
+	_paddingbottom = _paddingbottom or 0
+	_paddingleft = _paddingleft or 0
+
+	logo = {}
+	logo.header = _header
+	GlobalId = GlobalId + 1
+	logo.id = GlobalId
+	logo.parent = self.menu
+	logo.islogo = true
+	logo.subwidth = 100
+	logo.sprite = _sprite
+	logo.scale = _scale
+	logo.paddingtop = _paddingtop
+	logo.paddingright = _paddingright
+	logo.paddingbottom = _paddingbottom
+	logo.paddingleft = _paddingleft
+
+	logo.x = self.menu.subx + self.menu.subwidth + 10
+	logo.y = self.menu.y + self.menu.suby
+	result = (_sprite.width * _scale) + _paddingright + _paddingleft
+	if self.menu.subwidth < result then
+	    self.menu.subwidth = result
+	end
+
+	self.menu.suby = self.menu.suby + (logo.sprite.height * _scale) + _paddingtop + _paddingbottom
+
+	table.insert(self.menu.submenu, logo)
 end
 
 function MenuConfig:ColorPick(_header, _text, _value)
@@ -1366,6 +1404,10 @@ function MenuConfig:DrawMenu()
 		    		if _menu.parent == menu then
 		    			self:DrawSlider(_menu.name, _menu.value, _menu.minvalue, _menu.maxvalue, _menu.step, _menu.parent.subx, _menu.y, _menu.parent.subwidth, MenuStartHeight, _menu.open)
 		    		end
+		    	elseif _menu.islogo then
+		    		if _menu.parent == menu then
+		    			self:DrawLogo(_menu.sprite, _menu.parent.subx, _menu.y, _menu.parent.subwidth, _menu.sprite.height, _menu.scale, _menu.paddingtop, _menu.paddingright, _menu.paddingbottom, _menu.paddingleft)
+		    		end
 		    	end
 
 	    	end
@@ -1688,6 +1730,21 @@ function MenuConfig:DrawBoolean(text, status, x, y, width, height)
 	else
 		self:DrawTextIcon("ok", text, MenuTextSize, 30 + x, 5 + y, ARGB(255,255,255,255))
 	end
+end
+
+function MenuConfig:DrawLogo(sprite, x, y, width, height, scale, paddingtop, paddingright, paddingbottom, paddingleft)
+	-- draw border
+
+	height = (height * scale)
+
+	DrawRectangle(x - 5, y, 5, height + paddingtop + paddingbottom, ARGB(50,0,0,0))
+	DrawRectangle(x + width, y, 5, height  + paddingtop + paddingbottom, ARGB(50,0,0,0))
+	-- draw background
+	DrawRectangle(x, y, width, height + paddingtop + paddingbottom, ARGB(140,0,0,0))
+
+	-- draw logo
+	sprite:SetScale(scale, scale)
+	sprite:Draw(x + paddingleft, y + paddingtop, 255)
 end
 
 function MenuConfig:DrawInfo(text, icon, x, y, width, height)
