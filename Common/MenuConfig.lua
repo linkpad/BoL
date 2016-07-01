@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.8'
+local version = '1.9'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
