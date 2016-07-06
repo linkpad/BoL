@@ -1,5 +1,5 @@
 local debug = false
-local version = '2.0'
+local version = '2.1'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -122,9 +122,9 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 2.0", "leaf")
+    menuconf:Info("Version: 2.1", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
-    menuconf:Info("Updated: 06/07/2016", "clock")
+    menuconf:Info("Updated: 07/07/2016", "clock")
 end
 
 function addTargetSelector()
@@ -667,7 +667,7 @@ function MenuConfig:ColorPick(_header, _text, _value)
 	table.insert(self.menu.submenu, colorpick)
 end
 
-function MenuConfig:Slider(_header, _text, _value, _minvalue, _maxvalue, _step)
+function MenuConfig:Slider(_header, _text, _value, _minvalue, _maxvalue, _step, _callback)
 	assert((type(_header) == "string") and (type(_text) == "string") and (type(_value) == "number") and (type(_minvalue) == "number") and (type(_maxvalue) == "number") and (type(_step) == "number"), "MenuConfig:Slider : expected <string>, <string>, <int>, <int>, <int>, <int>)")
 	slider = {}
 	slider.header = _header
@@ -678,6 +678,7 @@ function MenuConfig:Slider(_header, _text, _value, _minvalue, _maxvalue, _step)
 	slider.name = _text
 	slider.open = false
 	slider.subwidth = 100
+	slider.callback = _callback
 
 	slider.value = _value
 
@@ -909,7 +910,6 @@ end
 
 
 function MenuConfig:OnTick()
-
     local cursor = GetCursorPos()
     self.pos = { x = cursor.x, y = cursor.y }
 
@@ -935,11 +935,35 @@ function MenuConfig:OnTick()
     				modulo = posvalue % submenu.step
     				stepping = submenu.step / 2
     				if modulo > stepping then
-    					submenu.value = (posvalue - modulo) + submenu.step
-    					submenu.instance[submenu.header] = submenu.value
+    					local old = submenu.value
+    					local value = (posvalue - modulo) + submenu.step
+    					if value < submenu.minvalue then
+    						value = submenu.minvalue
+    					elseif value > submenu.maxvalue then
+    						value = submenu.maxvalue
+    					end
+    					if value ~= old then
+		  					if submenu.callback ~= nil then
+			  					submenu.callback(value)
+			  				end
+    						submenu.value = value
+	    					submenu.instance[submenu.header] = submenu.value
+	  	  				end
     				else
-    					submenu.value = (posvalue - modulo)
-    					submenu.instance[submenu.header] = submenu.value
+    					local old = submenu.value
+    					local value = (posvalue - modulo) + submenu.step
+    					if value < submenu.minvalue then
+    						value = submenu.minvalue
+    					elseif value > submenu.maxvalue then
+    						value = submenu.maxvalue
+    					end
+    					if value ~= old then
+		  					if submenu.callback ~= nil then
+			  					submenu.callback(value)
+			  				end
+    						submenu.value = value
+	    					submenu.instance[submenu.header] = submenu.value
+	  	  				end
     				end
 
     				submenu.save()
