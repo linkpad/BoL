@@ -1,5 +1,5 @@
 local debug = false
-local version = '1.9'
+local version = '2.0'
 local Author = 'Linkpad - AuroraScripters'
 
 local _menuInit = false
@@ -122,9 +122,9 @@ function addSettings()
     menuconf:Section("MenuConfig - Settings", ARGB(255, 52, 152, 219))
     menuconf:KeyToggle("togglemenu", "Show/hide menu:", string.byte("M"))
     menuconf:Section("about menuconfig", ARGB(255, 52, 152, 219))
-    menuconf:Info("Version: 1.8", "leaf")
+    menuconf:Info("Version: 2.0", "leaf")
     menuconf:Info("Author: Linkpad - AuroraScripters")
-    menuconf:Info("Updated: 16/04/2016", "clock")
+    menuconf:Info("Updated: 06/07/2016", "clock")
 end
 
 function addTargetSelector()
@@ -164,6 +164,7 @@ end
 
 function MenuConfig:__init(_header, _name, _parent, _icon)
 	UpdateWindow()
+	assert((type(_header) == "string") and (type(_name) == "string"), "MenuConfig: expected <string>, <string>)")
 
 	if not _menuInit then
 	    _menuInit = true
@@ -259,7 +260,6 @@ function MenuConfig:__init(_header, _name, _parent, _icon)
 
 		table.insert(globalMenu, self.menu)
 	end
-
 end
 
 function MenuConfig:checkUpdate()
@@ -394,6 +394,8 @@ end
 
 -- #region MenuConfig API function
 function MenuConfig:Menu(_header, _name, _icon)
+	assert((type(_header) == "string") and (type(_name) == "string") and (type(_icon) == "string" or _icon == nil), "MenuConfig:Menu : expected <string>, <string>)")
+
 	local sub = MenuConfig(_header, _name, self.menu, _icon)
 	self[_header] = sub
 	printDebug("create menu " .. _header .. " parent is " .. self.menu.header)
@@ -444,6 +446,7 @@ function MenuConfig:Save()
 end
 
 function MenuConfig:KeyBinding(_header, _text, _key)
+	assert((type(_header) == "string") and (type(_text) == "string"), "MenuConfig:KeyBinding : expected <string>, <string>)")
 	keybinding = {}
 	keybinding.header = _header
 	GlobalId = GlobalId + 1
@@ -486,6 +489,7 @@ function MenuConfig:KeyBinding(_header, _text, _key)
 end
 
 function MenuConfig:KeyToggle(_header, _text, _key)
+	assert((type(_header) == "string") and (type(_text) == "string"), "MenuConfig:KeyToggle : expected <string>, <string>)")
 	keytoggle = {}
 	keytoggle.header = _header
 	GlobalId = GlobalId + 1
@@ -527,6 +531,9 @@ function MenuConfig:KeyToggle(_header, _text, _key)
 end
 
 function MenuConfig:TargetSelector(_header, _text, _mode, _range, _dmgtype, _targetselected, _enemyteam, _createsubmenu)
+	assert((type(_header) == "string") and (type(_text) == "string"), "MenuConfig:TargetSelector : expected <string>, <string>)")
+
+
 	targetselector = {}
 	targetselector.header = _header
 	GlobalId = GlobalId + 1
@@ -579,6 +586,8 @@ function MenuConfig:Tsmodechange(id, ts)
 end
 
 function MenuConfig:AddLogo(_header, _sprite, _scale, _paddingtop, _paddingright, _paddingbottom, _paddingleft)
+	assert((type(_header) == "string") and (_sprite ~= nil), "MenuConfig:AddLogo : expected <string>, <sprite>)")
+
 	if _sprite.width > 250 or _sprite.height > 250 then
 		print("the size of the sprite should be 250x250 max.")
 		return
@@ -617,6 +626,7 @@ function MenuConfig:AddLogo(_header, _sprite, _scale, _paddingtop, _paddingright
 end
 
 function MenuConfig:ColorPick(_header, _text, _value)
+	assert((type(_header) == "string") and (type(_text) == "string") and (type(_value) == "table"), "MenuConfig:ColorPick : expected <string>, <string>, <table>)")
 	colorpick = {}
 	colorpick.header = _header
 	GlobalId = GlobalId + 1
@@ -658,6 +668,7 @@ function MenuConfig:ColorPick(_header, _text, _value)
 end
 
 function MenuConfig:Slider(_header, _text, _value, _minvalue, _maxvalue, _step)
+	assert((type(_header) == "string") and (type(_text) == "string") and (type(_value) == "number") and (type(_minvalue) == "number") and (type(_maxvalue) == "number") and (type(_step) == "number"), "MenuConfig:Slider : expected <string>, <string>, <int>, <int>, <int>, <int>)")
 	slider = {}
 	slider.header = _header
 	GlobalId = GlobalId + 1
@@ -701,6 +712,8 @@ function MenuConfig:Slider(_header, _text, _value, _minvalue, _maxvalue, _step)
 end
 
 function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback, _allowsave, _callbackMenuClick)
+	assert((type(_header) == "string") and (type(_text) == "string") and (type(_value) == "number") and (type(_droptable) == "table" and next(_droptable) ~= nil), "MenuConfig:DropDown : expected <string>, <string>, <int>, <table>)")
+
 	dropdown = {}
 	dropdown.header = _header
 	GlobalId = GlobalId + 1
@@ -772,6 +785,7 @@ function MenuConfig:DropDown(_header, _text, _value, _droptable, _callback, _all
 end
 
 function MenuConfig:Boolean(_header, _text, _value, _callback)
+	assert((type(_header) == "string") and (type(_text) == "string") and (type(_value) == "boolean") , "MenuConfig:Boolean : expected <string>, <string>, <boolean>)")
 	boolean = {}
 	boolean.header = _header
 	GlobalId = GlobalId + 1
@@ -832,6 +846,7 @@ function MenuConfig:Set(_header, _value)
 end
 
 function MenuConfig:Info(_text, _icon)
+	assert((type(_text) == "string") and (type(_icon) == "string" or _icon == nil), "MenuConfig:Info : expected <string>)")
 	info = {}
 	GlobalId = GlobalId + 1
 	info.id = GlobalId
@@ -851,6 +866,7 @@ function MenuConfig:Info(_text, _icon)
 end
 
 function MenuConfig:Section(_name, _color)
+	assert((type(_name) == "string") and (type(_color) == "userdata" or _color == nil), "MenuConfig:Section : expected <string>)")
 
     if _color == nil then
         _color = ARGB(255,243,156,18)
