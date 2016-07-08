@@ -1,0 +1,9 @@
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\bin\Release\BoLConsole.exe.config
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\bin\Release\BoLConsole.exe
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\bin\Release\BoLConsole.pdb
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\bin\Release\MarkupConverter.dll
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Release\BoLConsole.Form1.resources
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Release\BoLConsole.Properties.Resources.resources
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Release\BoLConsole.csproj.GenerateResource.Cache
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Release\BoLConsole.exe
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Release\BoLConsole.pdb

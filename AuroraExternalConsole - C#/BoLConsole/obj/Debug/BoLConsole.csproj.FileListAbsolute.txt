@@ -1,0 +1,9 @@
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\bin\Debug\BoLConsole.exe.config
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\bin\Debug\BoLConsole.exe
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\bin\Debug\BoLConsole.pdb
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Debug\BoLConsole.csprojResolveAssemblyReference.cache
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Debug\BoLConsole.Form1.resources
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Debug\BoLConsole.Properties.Resources.resources
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Debug\BoLConsole.csproj.GenerateResource.Cache
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Debug\BoLConsole.exe
+d:\users\brandon\documents\visual studio 2013\Projects\BoLConsole\BoLConsole\obj\Debug\BoLConsole.pdb
